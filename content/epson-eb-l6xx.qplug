@@ -3,9 +3,9 @@
 -- For source, contact https://soloworks.co.uk
 
 PluginInfo = {
-	Name = "Epson~L6xx Projector", -- The tilde here indicates folder structure in the Shematic Elements pane
-	Version = "0.0.1",
-	Id = "SoloWorks.Epson.L6xxProjector.0.0.1", -- show this is just a unique id. Show some commented out 'fun' unique ids
+	Name = "Epson~L6xx Projector (0.0.0.0-master)", -- The tilde here indicates folder structure in the Shematic Elements pane
+	Version = "0.0.0.0-master",
+	Id = "SoloWorks.Epson.L6xxProjector.0.0.0.0-master", -- show this is just a unique id. Show some commented out 'fun' unique ids
 	Description = "Control for Epson range of L6xx projectors (ESC/VP21 protocol)",
 	ShowDebug = true,
 	Author = "Solo Works London"
@@ -294,15 +294,17 @@ function GetControlLayout(props)
 
 	-- Power box
 	x, y = 0, 144
+	--
 	--[[
 		layout["SourceActive"] = {
 		PrettyName = "Display~Source Active",
 		Style = "Fader",
 		Position = {x + 100, y},
 		Size = {36, 16}
-	}
-	]]--
-	layout["PowerOn"] = {
+	}]] 
+	layout[
+			"PowerOn"
+		] = {
 		Legend = "On",
 		PrettyName = "Display~Power On",
 		Style = "Button",
@@ -328,7 +330,7 @@ function GetControlLayout(props)
 		OffColor = "gray",
 		Color = "gray",
 		UnlinkOffColor = true,
-		Position = {x + 88, y +32},
+		Position = {x + 88, y + 32},
 		Size = {128, 30}
 	}
 	table.insert(
@@ -348,9 +350,9 @@ function GetControlLayout(props)
 
 	-- Source & Power State
 	x, y = 0, 216
-	
+
 	layout["SourceHDMI01"] = {
-		Legend = "HDMI1",
+		Legend = "HDMI 1",
 		PrettyName = "Display~HDMI 1",
 		Style = "Button",
 		ButtonStyle = "Momentary",
@@ -360,7 +362,7 @@ function GetControlLayout(props)
 		Size = {48, 32}
 	}
 	layout["SourceHDMI02"] = {
-		Legend = "HDMI2",
+		Legend = "HDMI 2",
 		PrettyName = "Display~HDMI 2",
 		Style = "Button",
 		ButtonStyle = "Momentary",
@@ -370,7 +372,7 @@ function GetControlLayout(props)
 		Size = {48, 32}
 	}
 	layout["SourceComputer01"] = {
-		Legend = "Computer1",
+		Legend = "Computer 1",
 		PrettyName = "Display~Computer 1",
 		Style = "Button",
 		ButtonStyle = "Momentary",
@@ -380,7 +382,7 @@ function GetControlLayout(props)
 		Size = {48, 32}
 	}
 	layout["SourceComputer02"] = {
-		Legend = "Computer2",
+		Legend = "Computer 2",
 		PrettyName = "Display~Computer 2",
 		Style = "Button",
 		ButtonStyle = "Momentary",
@@ -521,7 +523,6 @@ if Controls then
 		Controls.ConnectionState.String = epson.Host .. ":" .. epson.Port .. " Resting"
 	end
 
-	
 	-- Data Sending Helper Function
 	function fnSend(cmd, data)
 		if epson.ConnState == true then
@@ -558,8 +559,8 @@ if Controls then
 	conn.Connected = function(conn)
 		--print("TCP socket is connected")
 		setCommsState("Connected")
-		epson.ConnState = true		
-		conn:Write("ESC/VP.net\x10\x03\x00\x00\x00\x00")	
+		epson.ConnState = true
+		conn:Write("ESC/VP.net\x10\x03\x00\x00\x00\x00")
 		conn:Write("SNO?\r")
 		conn:Write("PWR?\r")
 		conn:Write("SOURCE?\r")
@@ -637,14 +638,6 @@ if Controls then
 			v.EventHandler = function(changedControl)
 				fnConnect()
 			end
-		elseif k == "Gain" then
-			v.EventHandler = function(changedControl)
-				print(string.sub(tostring(changedControl.Value),1,-3))
-				gainPaceVal = string.sub(tostring(changedControl.Value),1,-3)
-				if gainPacePend == false then
-					sendGain() -- Send Value
-				end
-			end
 		elseif k == "PowerOn" then
 			v.EventHandler = function(changedControl)
 				if changedControl.Boolean == true then
@@ -698,6 +691,23 @@ if Controls then
 					epson.desiredPower = true
 				end
 			end
+		elseif k == "AVMute" then
+			v.EventHandler = function(changedControl)
+				if changedControl.Boolean == true then
+					fnSend("MUTE", "ON")
+				else
+					fnSend("MUTE", "OFF")
+				end
+				conn:Write("MUTE?\r")
+			end
+		elseif k == "Gain" then
+			v.EventHandler = function(changedControl)
+				print(string.sub(tostring(changedControl.Value), 1, -3))
+				gainPaceVal = string.sub(tostring(changedControl.Value), 1, -3)
+				if gainPacePend == false then
+					sendGain() -- Send Value
+				end
+			end
 		end
 	end
 
@@ -713,35 +723,35 @@ if Controls then
 			debug("Power Status: Standby Mode (Network OFF)")
 			Controls.PowerState.Boolean = false
 			Controls.PowerState.String = "Standby - Network OFF"
-			Controls.PowerState.Color  = "gray"
+			Controls.PowerState.Color = "gray"
 		elseif status == "Standby Mode (Network ON)" then
 			debug("Power Status: Standby Mode (Network ON)")
 			Controls.PowerState.Boolean = false
 			Controls.PowerState.String = "Standby"
-			Controls.PowerState.Color  = "gray"
+			Controls.PowerState.Color = "gray"
 		elseif status == "Warmup" then
 			debug("Power Status: Warmup")
 			Controls.PowerState.Boolean = true
 			Controls.PowerState.String = "Standby - Warming up..."
-			Controls.PowerState.Color  = "yellow"
+			Controls.PowerState.Color = "yellow"
 		elseif status == "Cooldown" then
 			debug("Power Status: Cooldown")
 			Controls.PowerState.Boolean = true
 			Controls.PowerState.String = "Standby - Cooling down..."
-			Controls.PowerState.Color  = "yellow"
+			Controls.PowerState.Color = "yellow"
 		elseif status == "Lamp ON" then
 			debug("Power Status: Lamp ON")
 			Controls.PowerState.Boolean = true
 			Controls.PowerState.String = "Lamp ON"
-			Controls.PowerState.Color  = "green"
+			Controls.PowerState.Color = "green"
 		elseif status == "Abnormality standby" then
-			debug("Power Status: " .. string.sub(line,14,15) .. " Abnormality standby")
+			debug("Power Status: " .. string.sub(line, 14, 15) .. " Abnormality standby")
 			Controls.PowerState.String = "Warning - Abnormality standby"
-			Controls.PowerState.Color  = "red"
+			Controls.PowerState.Color = "red"
 			Controls.PowerState.Boolean = false
 		elseif status == "Error" then
 			debug("Error - Unknown Power state")
-			Controls.PowerState.Color  = "orange"
+			Controls.PowerState.Color = "orange"
 			Controls.PowerState.Boolean = false
 		end
 	end
@@ -751,80 +761,79 @@ if Controls then
 		line = data
 		debug("TCP socket has data:" .. line)
 		-- Serial number
-		if string.sub(line,1,3) == "SNO" then
-			debug("Serial Number: " .. string.sub(line,5,-3))
-			Controls.SerialNumber.String = string.sub(line,5,-3)
+		if string.sub(line, 1, 3) == "SNO" then
+			debug("Serial Number: " .. string.sub(line, 5, -3))
+			Controls.SerialNumber.String = string.sub(line, 5, -3)
 		end
 		-- Power status
-		--[[]]
-		if string.sub(line,1,3) == "PWR" then
-			debug("Power Status: " .. string.sub(line,-4,-3))
-			  if string.sub(line,-4,-2) == "00" then
+		if string.sub(line, 1, 3) == "PWR" then
+			debug("Power Status: " .. string.sub(line, -4, -3))
+			if string.sub(line, -4, -2) == "00" then
 				fnPowerFeedback("Standby Mode (Network OFF)")
-			  elseif string.sub(line,-4,-3) == "01" then
+			elseif string.sub(line, -4, -3) == "01" then
 				fnPowerFeedback("Lamp ON")
-			  elseif string.sub(line,-4,-3) == "02" then
+			elseif string.sub(line, -4, -3) == "02" then
 				fnPowerFeedback("Warmup")
-			  elseif string.sub(line,-4,-3) == "03" then
+			elseif string.sub(line, -4, -3) == "03" then
 				fnPowerFeedback("Cooldown")
-			  elseif string.sub(line,-4,-3) == "04" then
+			elseif string.sub(line, -4, -3) == "04" then
 				fnPowerFeedback("Standby Mode (Network ON)")
-			  elseif string.sub(line,-4,-3) == "05" then
+			elseif string.sub(line, -4, -3) == "05" then
 				fnPowerFeedback("Abnormality standby")
-		  	else
+			else
 				fnPowerFeedback("Error")
-		  	end
+			end
 		end
 		-- Power IMEVENT
-		if string.sub(line,1,12) == "IMEVENT=0001" then
-			if string.sub(line,14,15) == "00" then
+		if string.sub(line, 1, 12) == "IMEVENT=0001" then
+			if string.sub(line, 14, 15) == "00" then
 				fnPowerFeedback("Standby Mode (Network OFF)")
-			  elseif string.sub(line,14,15) == "01" then
+			elseif string.sub(line, 14, 15) == "01" then
 				fnPowerFeedback("Standby Mode (Network ON)")
-			  elseif string.sub(line,14,15) == "02" then
+			elseif string.sub(line, 14, 15) == "02" then
 				fnPowerFeedback("Warmup")
-			  elseif string.sub(line,14,15) == "03" then
+			elseif string.sub(line, 14, 15) == "03" then
 				fnPowerFeedback("Lamp ON")
-			  elseif string.sub(line,14,15) == "04" then
+			elseif string.sub(line, 14, 15) == "04" then
 				fnPowerFeedback("Cooldown")
-			  elseif string.sub(line,14,15) == "05" then
+			elseif string.sub(line, 14, 15) == "05" then
 				fnPowerFeedback("Abnormality standby")
-		  	end
+			end
 		end
 		-- Sources
-		if string.sub(line,1,6) == "SOURCE" then
-			debug("Input source code: " .. string.sub(line,-4,-3))
-		  	if string.sub(line,-4,-3) == "11" then
+		if string.sub(line, 1, 6) == "SOURCE" then
+			debug("Input source code: " .. string.sub(line, -4, -3))
+			if string.sub(line, -4, -3) == "11" then
 				debug("Active Source: " .. "Computer1")
-		  	elseif string.sub(line,-4,-3) == "21" then
-				debug("Active Source: " .. "Computer2") 
-		  	elseif string.sub(line,-4,-3) == "30" then
+			elseif string.sub(line, -4, -3) == "21" then
+				debug("Active Source: " .. "Computer2")
+			elseif string.sub(line, -4, -3) == "30" then
 				debug("Active Source: " .. "HDMI1")
-		  	elseif string.sub(line,-4,-3) == "52" then
+			elseif string.sub(line, -4, -3) == "52" then
 				debug("Active Source: " .. "USB1")
-		 	elseif string.sub(line,-4,-3) == "53" then
+			elseif string.sub(line, -4, -3) == "53" then
 				debug("Active Source: " .. "LAN")
-		 	elseif string.sub(line,-4,-3) == "56" then
+			elseif string.sub(line, -4, -3) == "56" then
 				debug("Active Source: " .. "Screen Mirroring")
-			elseif string.sub(line,-4,-3) == "80" then
+			elseif string.sub(line, -4, -3) == "80" then
 				debug("Active Source: " .. "HDBaseT")
-		 	elseif string.sub(line,-4,-3) == "A0" then
+			elseif string.sub(line, -4, -3) == "A0" then
 				debug("Active Source: " .. "HDMI2")
 			end
 		end
 		-- Signal Presence
-		if string.sub(line,1,6) == "SIGNAL" then
-			if string.sub(line,-4,-3) == "00" then
+		if string.sub(line, 1, 6) == "SIGNAL" then
+			if string.sub(line, -4, -3) == "00" then
 				print("No signal")
-			elseif string.sub(line,-4,-3) == "01" then
+			elseif string.sub(line, -4, -3) == "01" then
 				print("Signal detected")
-			elseif string.sub(line,-4,-3) == "FF" then
+			elseif string.sub(line, -4, -3) == "FF" then
 				print("Unsupported signal")
-		  	end
+			end
 		end
 	end
 
-	-- Setup Data Callbacks as required	
+	-- Setup Data Callbacks as required
 	conn.Data = function(conn)
 		fnProcessFeedback(conn:Read(conn.BufferLength))
 		-- Stop and restart Comms timer
