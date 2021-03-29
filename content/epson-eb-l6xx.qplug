@@ -13,7 +13,7 @@ PluginInfo = {
 
 -- Once you've drawn your plugin in Designer, you can determine what colors you use a lot. Save yourself some time by putting them in a table, and then simply calling them later.
 local Colors = {
-	epson_blue = {16,33,139},
+	epson_blue = {16, 33, 139},
 	White = {255, 255, 255},
 	Black = {0, 0, 0},
 	Red = {255, 0, 0},
@@ -21,7 +21,7 @@ local Colors = {
 }
 
 function GetColor(props)
-    return Colors.epson_blue
+	return Colors.epson_blue
 end
 
 -- We can let users determine some of the plugin properties by exposing them here
@@ -222,68 +222,58 @@ end
 -- This function allows you to layout pages in your plugin.
 function GetControlLayout(props)
 	local layout = {}
-	local graphics = {}
 
-	local x, y = 0, 0
+	local btn_size = {48, 32}
+	local title_size = {6 * btn_size[1], btn_size[2]}
+	local status_groupbox_size = {title_size[1], 4 * btn_size[2]}
+	local power_groupbox_position = {0, title_size[2] + status_groupbox_size[2] + (0.5 * btn_size[2])}
+	local power_groupbox_size = {status_groupbox_size[1], 2.5 * btn_size[2]}
+	local display_groupbox_position = {0, power_groupbox_position[2] + power_groupbox_size[2] + (0.5 * btn_size[2])}
 
-	-- System & Connection System
-	layout["Online"] = {
-		PrettyName = "System~Online",
-		Style = "Indicator",
-		Color = {0, 255, 0},
-		Position = {x + 3, y + 25},
-		Size = {25, 25}
-	}
-	layout["ConnectionState"] = {
-		Style = "Text",
-		HTextAlign = "Left",
-		Padding = 5,
-		StrokeWidth = 0,
-		Position = {x + 35, y + 25},
-		Size = {200, 25}
-	}
-	table.insert(
-		graphics,
+	graphics = {
 		{
-			Type = "GroupBox", -- This is the overall groupbox that will give the plugin a more 'contained' look
-			Text = "Connection",
+			Type = "Header",
+			Text = "Epson Projector",
+			HTextAlign = "Center",
+			Color = Colors.epson_blue,
+			FontSize = 16,
+			Position = {0, 0},
+			Size = title_size
+		},
+		{
+			Type = "GroupBox",
+			Text = "Status",
 			HTextAlign = "Left",
 			Fill = Colors.White,
 			CornerRadius = 8,
-			StrokeColor = Colors.Black,
+			StrokeColor = Colors.epson_blue,
+			Color = Colors.epson_blue,
 			StrokeWidth = 1,
-			Position = {x, y},
-			Size = {256, 64} -- The width of the main GroupBox is dependent on how many channels the user specified. More channels means a wider group box
-		}
-	)
-
-	-- Meta Data Infomation
-	x, y = 0, 72
-	layout["SerialNumber"] = {
-		PrettyName = "System~Serial Number",
-		Style = "Text",
-		HTextAlign = "Left",
-		Padding = 5,
-		StrokeWidth = 0,
-		Position = {x + 100, y + 25},
-		Size = {125, 20}
-	}
-	table.insert(
-		graphics,
+			Position = {0, title_size[2]},
+			Size = status_groupbox_size
+		},
 		{
-			Type = "GroupBox", -- This is the overall groupbox that will give the plugin a more 'contained' look
-			Text = "Hardware",
-			HTextAlign = "Left",
-			Fill = Colors.White,
-			CornerRadius = 8,
-			StrokeColor = Colors.Black,
-			StrokeWidth = 1,
-			Position = {x, y},
-			Size = {256, 64}
-		}
-	)
-	table.insert(
-		graphics,
+			Type = "Text",
+			Text = "Online:",
+			Font = "Roboto",
+			FontSize = 12,
+			FontStyle = "Bold",
+			HTextAlign = "Right",
+			Color = Colors.Black,
+			Position = {0, title_size[2] + (0.5 * btn_size[2])},
+			Size = {2 * btn_size[1], btn_size[2]}
+		},
+		{
+			Type = "Text",
+			Text = "Connection:",
+			Font = "Roboto",
+			FontSize = 12,
+			FontStyle = "Bold",
+			HTextAlign = "Right",
+			Color = Colors.Black,
+			Position = {0, title_size[2] + (1.5 * btn_size[2])},
+			Size = {2 * btn_size[1], btn_size[2]}
+		},
 		{
 			Type = "Text",
 			Text = "Serial No:",
@@ -292,187 +282,35 @@ function GetControlLayout(props)
 			FontStyle = "Bold",
 			HTextAlign = "Right",
 			Color = Colors.Black,
-			Position = {x + 10, y + 25},
-			Size = {85, 20}
-		}
-	)
-
-	-- Power box
-	x, y = 0, 144
-	--
-	--[[
-		layout["SourceActive"] = {
-		PrettyName = "Display~Source Active",
-		Style = "Fader",
-		Position = {x + 100, y},
-		Size = {36, 16}
-	}]] 
-	layout[
-			"PowerOn"
-		] = {
-		Legend = "On",
-		PrettyName = "Display~Power On",
-		Style = "Button",
-		ButtonStyle = "Momentary",
-		Color = {223, 0, 36},
-		UnlinkOffColor = false,
-		Position = {x + 8, y + 32},
-		Size = {30, 30}
-	}
-	layout["PowerOff"] = {
-		Legend = "Off",
-		PrettyName = "Display~Power Off",
-		Style = "Button",
-		ButtonStyle = "Momentary",
-		Color = {223, 0, 36},
-		UnlinkOffColor = false,
-		Position = {x + 48, y + 32},
-		Size = {30, 30}
-	}
-	layout["PowerState"] = {
-		PrettyName = "Display~Power State",
-		Style = "Indicator",
-		OffColor = "gray",
-		Color = "gray",
-		UnlinkOffColor = true,
-		Position = {x + 88, y + 32},
-		Size = {128, 30}
-	}
-	table.insert(
-		graphics,
+			Position = {0, title_size[2] + (2.5 * btn_size[2])},
+			Size = {2 * btn_size[1], btn_size[2]}
+		},
 		{
-			Type = "GroupBox", -- This is the overall groupbox that will give the plugin a more 'contained' look
+			Type = "GroupBox",
 			Text = "Power",
 			HTextAlign = "Left",
 			Fill = Colors.White,
 			CornerRadius = 8,
-			StrokeColor = Colors.Black,
+			StrokeColor = Colors.epson_blue,
+			Color = Colors.epson_blue,
 			StrokeWidth = 1,
-			Position = {x, y},
-			Size = {256, 64}
-		}
-	)
-
-	-- Source & Power State
-	x, y = 0, 216
-
-	layout["SourceHDMI01"] = {
-		Legend = "HDMI 1",
-		PrettyName = "Display~HDMI 1",
-		Style = "Button",
-		ButtonStyle = "Momentary",
-		Color = {223, 0, 36},
-		UnlinkOffColor = false,
-		Position = {x + 8, y + 32},
-		Size = {48, 32}
-	}
-	layout["SourceHDMI02"] = {
-		Legend = "HDMI 2",
-		PrettyName = "Display~HDMI 2",
-		Style = "Button",
-		ButtonStyle = "Momentary",
-		Color = {223, 0, 36},
-		UnlinkOffColor = false,
-		Position = {x + 64, y + 32},
-		Size = {48, 32}
-	}
-	layout["SourceComputer01"] = {
-		Legend = "Computer 1",
-		PrettyName = "Display~Computer 1",
-		Style = "Button",
-		ButtonStyle = "Momentary",
-		Color = {223, 0, 36},
-		UnlinkOffColor = false,
-		Position = {x + 120, y + 32},
-		Size = {48, 32}
-	}
-	layout["SourceComputer02"] = {
-		Legend = "Computer 2",
-		PrettyName = "Display~Computer 2",
-		Style = "Button",
-		ButtonStyle = "Momentary",
-		Color = {223, 0, 36},
-		UnlinkOffColor = false,
-		Position = {x + 176, y + 32},
-		Size = {48, 32}
-	}
-	layout["SourceHDBaseT"] = {
-		Legend = "HDBaseT",
-		PrettyName = "Display~HDBaseT",
-		Style = "Button",
-		ButtonStyle = "Momentary",
-		Color = {223, 0, 36},
-		UnlinkOffColor = false,
-		Position = {x + 8, y + 64},
-		Size = {48, 32}
-	}
-	layout["SourceLAN"] = {
-		Legend = "LAN",
-		PrettyName = "Display~LAN",
-		Style = "Button",
-		ButtonStyle = "Momentary",
-		Color = {223, 0, 36},
-		UnlinkOffColor = false,
-		Position = {x + 64, y + 64},
-		Size = {48, 32}
-	}
-	layout["SourceUSB"] = {
-		Legend = "USB",
-		PrettyName = "Display~USB",
-		Style = "Button",
-		ButtonStyle = "Momentary",
-		Color = {223, 0, 36},
-		UnlinkOffColor = false,
-		Position = {x + 120, y + 64},
-		Size = {48, 32}
-	}
-	layout["SourceScreenMirroring"] = {
-		Legend = "Screen\rMirroring",
-		PrettyName = "Display~Screen Mirroring",
-		Style = "Button",
-		ButtonStyle = "Momentary",
-		Color = {223, 0, 36},
-		UnlinkOffColor = false,
-		Position = {x + 176, y + 64},
-		Size = {48, 32}
-	}
-	table.insert(
-		graphics,
+			Position = power_groupbox_position,
+			Size = power_groupbox_size
+		},
 		{
-			Type = "GroupBox", -- This is the overall groupbox that will give the plugin a more 'contained' look
-			Text = "Source",
+			Type = "GroupBox",
+			Text = "Display",
 			HTextAlign = "Left",
 			Fill = Colors.White,
 			CornerRadius = 8,
-			StrokeColor = Colors.Black,
+			StrokeColor = Colors.epson_blue,
+			Color = Colors.epson_blue,
 			StrokeWidth = 1,
-			Position = {x, y},
-			Size = {256, 96}
+			Position = display_groupbox_position,
+			Size = {status_groupbox_size[1], 4.5 * btn_size[2]}
 		}
-	)
-
-	-- Audio State
-	x, y = 0, y + 96 + 8
-	layout["Gain"] = {
-		PrettyName = "Audio~Gain",
-		Style = "Fader",
-		Position = {x + 50, y + 32},
-		Size = {180, 30}
-	}
-	layout["AVMute"] = {
-		Legend = "AV Mute",
-		PrettyName = "Display~Mute",
-		Style = "Button",
-		ButtonStyle = "Toggle",
-		Color = {223, 0, 36},
-		UnlinkOffColor = false,
-		Position = {x + 5, y + 32},
-		Size = {30, 30}
-	}
-	table.insert(
-		graphics,
-		{
-			Type = "GroupBox", -- This is the overall groupbox that will give the plugin a more 'contained' look
+		--[[{
+			Type = "GroupBox",
 			Text = "Audio",
 			HTextAlign = "Left",
 			Fill = Colors.White,
@@ -481,8 +319,154 @@ function GetControlLayout(props)
 			StrokeWidth = 1,
 			Position = {x, y},
 			Size = {256, 64} -- The width of the main GroupBox is dependent on how many channels the user specified. More channels means a wider group box
-		}
-	)
+		}]]
+	}
+
+	-- Meta Data Infomation
+	layout["Online"] = {
+		PrettyName = "System~Online",
+		Style = "Indicator",
+		Color = {0, 255, 0},
+		Position = {2 * btn_size[1], title_size[2] + (0.5 * btn_size[2])},
+		Size = {btn_size[2], btn_size[2]}
+	}
+	layout["ConnectionState"] = {
+		Style = "Text",
+		HTextAlign = "Left",
+		Padding = 5,
+		StrokeWidth = 0,
+		Position = {2 * btn_size[1], title_size[2] + (1.5 * btn_size[2])},
+		Size = {3 * btn_size[1], btn_size[2]}
+	}
+	layout["SerialNumber"] = {
+		PrettyName = "System~Serial Number",
+		Style = "Text",
+		HTextAlign = "Left",
+		Padding = 5,
+		StrokeWidth = 0,
+		Position = {2 * btn_size[1], title_size[2] + (2.5 * btn_size[2])},
+		Size = {3 * btn_size[1], btn_size[2]}
+	}
+	--power
+	--[[
+		layout["SourceActive"] = {
+		PrettyName = "Display~Source Active",
+		Style = "Fader",
+		Position = {x + 100, y},
+		Size = {36, 16}
+	}]]
+	layout["PowerOn"] = {
+		Legend = "On",
+		PrettyName = "Power~On",
+		Style = "Button",
+		ButtonStyle = "Momentary",
+		Color = {223, 0, 36},
+		UnlinkOffColor = false,
+		Position = {0.5 * btn_size[1], power_groupbox_position[2] + btn_size[2]},
+		Size = btn_size
+	}
+	layout["PowerOff"] = {
+		Legend = "Off",
+		PrettyName = "Power~Off",
+		Style = "Button",
+		ButtonStyle = "Momentary",
+		Color = {223, 0, 36},
+		UnlinkOffColor = false,
+		Position = {1.5 * btn_size[1], power_groupbox_position[2] + btn_size[2]},
+		Size = btn_size
+	}
+	layout["PowerState"] = {
+		PrettyName = "Power~State",
+		Style = "Indicator",
+		OffColor = "gray",
+		Color = "gray",
+		UnlinkOffColor = true,
+		Position = {2.5 * btn_size[1], power_groupbox_position[2] + btn_size[2]},
+		Size = {3 * btn_size[1], btn_size[2]}
+	}
+
+	--display
+	layout["AVMute"] = {
+		Legend = "AV Mute",
+		PrettyName = "Display~AV Mute",
+		Style = "Button",
+		ButtonStyle = "Toggle",
+		Color = {223, 0, 36},
+		UnlinkOffColor = false,
+		Position = {0.5 * btn_size[1], display_groupbox_position[2] + btn_size[2]},
+		Size = {4 * btn_size[1], btn_size[2]}
+	}
+
+	layout["SourceHDMI01"] = {
+		Legend = "HDMI 1",
+		PrettyName = "Display~HDMI 1",
+		Style = "Button",
+		ButtonStyle = "Momentary",
+		Position = {0.5 * btn_size[1], display_groupbox_position[2] + 2 * btn_size[2]},
+		Size = btn_size
+	}
+	layout["SourceHDMI02"] = {
+		Legend = "HDMI 2",
+		PrettyName = "Display~HDMI 2",
+		Style = "Button",
+		ButtonStyle = "Momentary",
+		Position = {1.5 * btn_size[1], display_groupbox_position[2] + 2 * btn_size[2]},
+		Size = btn_size
+	}
+	layout["SourceComputer01"] = {
+		Legend = "Computer 1",
+		PrettyName = "Display~Computer 1",
+		Style = "Button",
+		ButtonStyle = "Momentary",
+		Position = {2.5 * btn_size[1], display_groupbox_position[2] + 2 * btn_size[2]},
+		Size = btn_size
+	}
+	layout["SourceComputer02"] = {
+		Legend = "Computer 2",
+		PrettyName = "Display~Computer 2",
+		Style = "Button",
+		ButtonStyle = "Momentary",
+		Position = {3.5 * btn_size[1], display_groupbox_position[2] + 2 * btn_size[2]},
+		Size = btn_size
+	}
+	layout["SourceHDBaseT"] = {
+		Legend = "HDBaseT",
+		PrettyName = "Display~HDBaseT",
+		Style = "Button",
+		ButtonStyle = "Momentary",
+		Position = {0.5 * btn_size[1], display_groupbox_position[2] + 3 * btn_size[2]},
+		Size = btn_size
+	}
+	layout["SourceLAN"] = {
+		Legend = "LAN",
+		PrettyName = "Display~LAN",
+		Style = "Button",
+		ButtonStyle = "Momentary",
+		Position = {1.5 * btn_size[1], display_groupbox_position[2] + 3 * btn_size[2]},
+		Size = btn_size
+	}
+	layout["SourceUSB"] = {
+		Legend = "USB",
+		PrettyName = "Display~USB",
+		Style = "Button",
+		ButtonStyle = "Momentary",
+		Position = {2.5 * btn_size[1], display_groupbox_position[2] + 3 * btn_size[2]},
+		Size = btn_size
+	}
+	layout["SourceScreenMirroring"] = {
+		Legend = "Screen\rMirroring",
+		PrettyName = "Display~Screen Mirroring",
+		Style = "Button",
+		ButtonStyle = "Momentary",
+		Position = {3.5 * btn_size[1], display_groupbox_position[2] + 3 * btn_size[2]},
+		Size = btn_size
+	}
+	--[[layout["Gain"] = {
+		PrettyName = "Audio~Gain",
+		Style = "Fader",
+		Position = {x + 50, y + 32},
+		Size = {180, 30}
+	}]]
 	return layout, graphics
 end
 
