@@ -8,3 +8,4 @@ Current Features:
 
 - Power ON/OFF
 - Source Selection
+- AV Mute
